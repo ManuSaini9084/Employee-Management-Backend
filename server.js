@@ -1,10 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
-const employeeRoutes = require(path.join(__dirname, 'routes', 'employeeRoutes'));
-const userRoutes = require(path.join(__dirname, 'routes', 'userRoutes'));
-
+const employeeRoutes = require('./routes/EmployeeRoutes');
+const userRoutes = require('./routes/UserRoutes');
 
 const app = express();
 app.use(cors());

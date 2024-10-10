@@ -1,26 +1,23 @@
 const express = require('express');
 const multer = require('multer');
-const Employee = require('../models/employee'); // Make sure this path is correct
+const Employee = require('../models/employee');
 
 const router = express.Router();
 
-// Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Ensure this folder exists
+    cb(null, 'uploads/'); 
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname); // Add timestamp to prevent filename conflicts
+    cb(null, Date.now() + '-' + file.originalname); 
   },
 });
 
-// Initialize multer
 const upload = multer({ storage: storage });
 
-// Create an employee
 router.post('/create', upload.single('image'), async (req, res) => {
   const { name, email, mobile, designation, gender, course } = req.body;
-  const image = req.file.path; // Get the path of the uploaded image
+  const image = req.file.path; 
 
   try {
     const newEmployee = new Employee({
@@ -41,7 +38,6 @@ router.post('/create', upload.single('image'), async (req, res) => {
   }
 });
 
-// GET all employees
 router.get('/', async (req, res) => {
   try {
     const employees = await Employee.find();
@@ -51,7 +47,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// UPDATE employee details
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
@@ -59,7 +54,6 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 
     const { name, email, mobileNo, designation, gender, course } = req.body;
 
-    // Check if new email is unique
     if (employee.email !== email) {
       const existingEmployee = await Employee.findOne({ email });
       if (existingEmployee) return res.status(400).json({ message: "Email already exists" });

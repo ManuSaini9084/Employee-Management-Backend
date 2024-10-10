@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const Employee = require('../models/Employee');
-
+const mongoose = require('mongoose');
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -46,6 +46,25 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+router.get('/:id', async (req, res) => {
+  console.log(`Received request for employee ID: ${req.params.id}`);
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "Invalid employee ID" });
+  }
+
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) {
+      console.error(`Employee with ID ${req.params.id} not found in database.`);
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    res.json(employee);
+  } catch (err) {
+    console.error(`Error fetching employee with ID ${req.params.id}:`, err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
@@ -53,7 +72,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     if (!employee) return res.status(404).json({ message: "Employee not found" });
 
     const { name, email, mobileNo, designation, gender, course } = req.body;
-
+   console.log(req.body);
     if (employee.email !== email) {
       const existingEmployee = await Employee.findOne({ email });
       if (existingEmployee) return res.status(400).json({ message: "Email already exists" });
@@ -75,7 +94,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 });
 
 // DELETE an employee
-const mongoose = require('mongoose');
+
 
 router.delete('/:id', async (req, res) => {
   try {
